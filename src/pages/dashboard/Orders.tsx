@@ -1,16 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Filter, MoreHorizontal, FileText, ChevronRight, Download } from 'lucide-react';
-
-// Mock data based on requirements
-const mockOrders = [
-  { id: 'OS-0042', client: 'João Silva', phone: '(11) 98765-4321', device: 'iPhone 13 Pro', status: 'Em Análise', amount: '-', date: 'Hoje, 10:30' },
-  { id: 'OS-0041', client: 'Maria Oliveira', phone: '(11) 91234-5678', device: 'Samsung S22', status: 'Aguardando Peça', amount: 'R$ 450,00', date: 'Ontem, 16:45' },
-  { id: 'OS-0040', client: 'Carlos Santos', phone: '(11) 99988-7766', device: 'iPad Air 4', status: 'Pronto', amount: 'R$ 890,00', date: '28/04/2026' },
-  { id: 'OS-0039', client: 'Ana Clara', phone: '(11) 97766-5544', device: 'iPhone 11', status: 'Entregue', amount: 'R$ 320,00', date: '27/04/2026' },
-  { id: 'OS-0038', client: 'Pedro Mendes', phone: '(11) 96655-4433', device: 'Xiaomi Poco X3', status: 'Aguardando Aprovação', amount: 'R$ 250,00', date: '26/04/2026' },
-  { id: 'OS-0037', client: 'Lucia Costa', phone: '(11) 95544-3322', device: 'Motorola Edge', status: 'Em Reparo', amount: 'R$ 600,00', date: '25/04/2026' },
-];
+import { supabase } from '../../lib/supabase';
 
 const statusColors: Record<string, string> = {
   'Recebido': 'bg-gray-100 text-gray-700',
@@ -27,6 +18,42 @@ const statusColors: Record<string, string> = {
 
 const Orders = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
+      const { data: profile } = await supabase.from('profiles').select('company_id').eq('id', user.id).single();
+      if (!profile) return;
+
+      const { data, error } = await supabase
+        .from('orders')
+        .select(`
+          id,
+          status,
+          created_at,
+          clients (name, phone),
+          devices (model)
+        `)
+        .eq('company_id', profile.company_id)
+        .order('created_at', { ascending: false });
+        
+      if (error) throw error;
+      setOrders(data || []);
+    } catch (err) {
+      console.error('Erro ao buscar ordens:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
   
   return (
     <div className="space-y-6">
@@ -86,41 +113,55 @@ const Orders = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#E5E5E5]">
-              {mockOrders.map((order) => (
-                <tr key={order.id} className="hover:bg-[#F5F5F7]/50 transition-colors group cursor-pointer">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 font-semibold text-[#1A1A1A]">
-                      <FileText className="w-4 h-4 text-gray-400" />
-                      {order.id}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <p className="font-medium text-[#1A1A1A]">{order.client}</p>
-                    <p className="text-xs text-gray-500">{order.phone}</p>
-                  </td>
-                  <td className="px-6 py-4">
-                    <p className="text-[#1A1A1A]">{order.device}</p>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2.5 py-1 rounded-md text-xs font-semibold ${statusColors[order.status] || 'bg-gray-100 text-gray-700'}`}>
-                      {order.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 font-medium text-[#1A1A1A]">
-                    {order.amount}
-                  </td>
-                  <td className="px-6 py-4 text-gray-500">
-                    {order.date}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Link to={`/dashboard/orders/${order.id}`} className="p-1.5 text-gray-500 hover:text-[#1A1A1A] hover:bg-gray-200 rounded-md transition-colors">
-                        <ChevronRight className="w-5 h-5" />
-                      </Link>
-                    </div>
+              {loading ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                    Carregando ordens...
                   </td>
                 </tr>
-              ))}
+              ) : orders.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                    Nenhuma ordem de serviço encontrada.
+                  </td>
+                </tr>
+              ) : (
+                orders.map((order) => (
+                  <tr key={order.id} className="hover:bg-[#F5F5F7]/50 transition-colors group cursor-pointer">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2 font-semibold text-[#1A1A1A]">
+                        <FileText className="w-4 h-4 text-gray-400" />
+                        {order.id.split('-')[0]}...
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <p className="font-medium text-[#1A1A1A]">{order.clients?.name || '-'}</p>
+                      <p className="text-xs text-gray-500">{order.clients?.phone || '-'}</p>
+                    </td>
+                    <td className="px-6 py-4">
+                      <p className="text-[#1A1A1A]">{order.devices?.model || '-'}</p>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`px-2.5 py-1 rounded-md text-xs font-semibold ${statusColors[order.status] || 'bg-gray-100 text-gray-700'}`}>
+                        {order.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 font-medium text-[#1A1A1A]">
+                      -
+                    </td>
+                    <td className="px-6 py-4 text-gray-500">
+                      {new Date(order.created_at).toLocaleDateString('pt-BR')}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Link to={`/dashboard/orders/${order.id}`} className="p-1.5 text-gray-500 hover:text-[#1A1A1A] hover:bg-gray-200 rounded-md transition-colors">
+                          <ChevronRight className="w-5 h-5" />
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

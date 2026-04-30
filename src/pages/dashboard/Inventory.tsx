@@ -1,13 +1,7 @@
 import React, { useState } from 'react';
 import { Download, Search, Filter, Plus, Package, AlertTriangle, ArrowRightLeft, DollarSign } from 'lucide-react';
 
-const mockItems = [
-  { id: 'PC-001', name: 'Tela iPhone 13 Pro', category: 'Telas', model: 'iPhone 13 Pro', qtd: 5, cost: 'R$ 650,00', price: 'R$ 1.200,00', status: 'normal' },
-  { id: 'PC-002', name: 'Bateria iPhone 11', category: 'Baterias', model: 'iPhone 11', qtd: 1, cost: 'R$ 80,00', price: 'R$ 250,00', status: 'low' },
-  { id: 'PC-003', name: 'Conector de Carga', category: 'Conectores', model: 'Samsung S22', qtd: 0, cost: 'R$ 35,00', price: 'R$ 150,00', status: 'empty' },
-  { id: 'PC-004', name: 'Câmera Traseira', category: 'Câmeras', model: 'iPhone 12', qtd: 3, cost: 'R$ 280,00', price: 'R$ 550,00', status: 'normal' },
-  { id: 'PC-005', name: 'Tela iPad Air 4', category: 'Telas', model: 'iPad Air 4', qtd: 2, cost: 'R$ 450,00', price: 'R$ 850,00', status: 'normal' },
-];
+const mockItems: any[] = [];
 
 const statusConfig: Record<string, { label: string, color: string }> = {
   normal: { label: 'Em Estoque', color: 'bg-green-100 text-green-700' },

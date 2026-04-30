@@ -2,13 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Filter, MoreHorizontal, User, Smartphone, Download, Plus, MessageCircle } from 'lucide-react';
 
-const mockClients = [
-  { id: '1', name: 'João Silva', phone: '(11) 98765-4321', email: 'joao.silva@email.com', devices: 2, spent: 'R$ 1.450,00', lastVisit: 'Hoje' },
-  { id: '2', name: 'Maria Oliveira', phone: '(11) 91234-5678', email: 'maria.o@email.com', devices: 1, spent: 'R$ 450,00', lastVisit: 'Ontem' },
-  { id: '3', name: 'Carlos Santos', phone: '(11) 99988-7766', email: 'carlos@empresa.com', devices: 4, spent: 'R$ 3.890,00', lastVisit: '28/04/2026' },
-  { id: '4', name: 'Ana Clara', phone: '(11) 97766-5544', email: '-', devices: 1, spent: 'R$ 320,00', lastVisit: '15/04/2026' },
-  { id: '5', name: 'Pedro Mendes', phone: '(11) 96655-4433', email: 'pedromendes@email.com', devices: 3, spent: 'R$ 1.250,00', lastVisit: '10/03/2026' },
-];
+const mockClients: any[] = [];
 
 const Clients = () => {
   const [searchTerm, setSearchTerm] = useState('');

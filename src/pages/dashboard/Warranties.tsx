@@ -2,12 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Filter, Shield, ShieldAlert, ShieldX, Plus, FileText, Printer } from 'lucide-react';
 
-const mockWarranties = [
-  { id: 'GAR-0042', os: 'OS-0042', client: 'João Silva', device: 'iPhone 13 Pro', service: 'Troca de Tela', expires: '28/07/2026', status: 'Ativa' },
-  { id: 'GAR-0040', os: 'OS-0040', client: 'Carlos Santos', device: 'iPad Air 4', service: 'Bateria', expires: '28/05/2026', status: 'Ativa' },
-  { id: 'GAR-0035', os: 'OS-0035', client: 'Ana Clara', device: 'iPhone 11', service: 'Conector de Carga', expires: '15/04/2026', status: 'Vencida' },
-  { id: 'GAR-0022', os: 'OS-0022', client: 'Pedro Mendes', device: 'Xiaomi Poco X3', service: 'Software', expires: '10/02/2026', status: 'Cancelada' },
-];
+const mockWarranties: any[] = [];
 
 const statusConfig: Record<string, { color: string, icon: any }> = {
   'Ativa': { color: 'bg-green-100 text-green-700 border-green-200', icon: Shield },

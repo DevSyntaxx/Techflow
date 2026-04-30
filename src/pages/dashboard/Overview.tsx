@@ -13,41 +13,28 @@ import {
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-const data = [
-  { name: 'Jan', faturamento: 4000 },
-  { name: 'Fev', faturamento: 3000 },
-  { name: 'Mar', faturamento: 2000 },
-  { name: 'Abr', faturamento: 2780 },
-  { name: 'Mai', faturamento: 1890 },
-  { name: 'Jun', faturamento: 2390 },
-  { name: 'Jul', faturamento: 3490 },
-];
+const data: any[] = [];
 
 const stats = [
-  { title: 'Ordens Abertas', value: '12', icon: FileText, color: 'text-blue-500', bg: 'bg-blue-50' },
-  { title: 'Em Andamento', value: '8', icon: Wrench, color: 'text-orange-500', bg: 'bg-orange-50' },
-  { title: 'Prontas', value: '15', icon: CheckCircle, color: 'text-green-500', bg: 'bg-green-50' },
-  { title: 'Entregues (Mês)', value: '45', icon: PackageCheck, color: 'text-[#1A1A1A]', bg: 'bg-gray-100' },
+  { title: 'Ordens Abertas', value: '0', icon: FileText, color: 'text-blue-500', bg: 'bg-blue-50' },
+  { title: 'Em Andamento', value: '0', icon: Wrench, color: 'text-orange-500', bg: 'bg-orange-50' },
+  { title: 'Prontas', value: '0', icon: CheckCircle, color: 'text-green-500', bg: 'bg-green-50' },
+  { title: 'Entregues (Mês)', value: '0', icon: PackageCheck, color: 'text-[#1A1A1A]', bg: 'bg-gray-100' },
 ];
 
 const financialStats = [
-  { title: 'Faturamento (Mês)', value: 'R$ 14.250,00', icon: TrendingUp, trend: '+12.5%' },
-  { title: 'Lucro Estimado', value: 'R$ 6.120,00', icon: DollarSign, trend: '+8.2%' },
+  { title: 'Faturamento (Mês)', value: 'R$ 0,00', icon: TrendingUp, trend: '0%' },
+  { title: 'Lucro Estimado', value: 'R$ 0,00', icon: DollarSign, trend: '0%' },
 ];
 
 const alerts = [
-  { title: 'Aguardando Peça', count: 3, icon: AlertCircle, color: 'text-red-500' },
-  { title: 'Garantias Vencendo', count: 2, icon: Clock, color: 'text-orange-500' },
-  { title: 'Orçamentos Pendentes', count: 5, icon: FileQuestion, color: 'text-blue-500' },
-  { title: 'Leads em Aberto', count: 7, icon: UserPlus, color: 'text-purple-500' },
+  { title: 'Aguardando Peça', count: 0, icon: AlertCircle, color: 'text-red-500' },
+  { title: 'Garantias Vencendo', count: 0, icon: Clock, color: 'text-orange-500' },
+  { title: 'Orçamentos Pendentes', count: 0, icon: FileQuestion, color: 'text-blue-500' },
+  { title: 'Leads em Aberto', count: 0, icon: UserPlus, color: 'text-purple-500' },
 ];
 
-const recentOrders = [
-  { id: 'OS-0042', client: 'João Silva', device: 'iPhone 13 Pro', status: 'Em Análise', date: 'Hoje, 10:30' },
-  { id: 'OS-0041', client: 'Maria Oliveira', device: 'Samsung S22', status: 'Aguardando Peça', date: 'Ontem, 16:45' },
-  { id: 'OS-0040', client: 'Carlos Santos', device: 'iPad Air 4', status: 'Pronto', date: '28/04/2026' },
-  { id: 'OS-0039', client: 'Ana Clara', device: 'iPhone 11', status: 'Entregue', date: '27/04/2026' },
-];
+const recentOrders: any[] = [];
 
 const statusColors: Record<string, string> = {
   'Em Análise': 'bg-blue-100 text-blue-700',

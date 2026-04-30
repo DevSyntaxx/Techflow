@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../../lib/supabase';
 import { 
   ArrowLeft, Save, Printer, Share2, 
   User, Smartphone, ClipboardList, PenTool, 
@@ -20,9 +21,69 @@ const timeline = [
 
 const OrderDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const isNew = !id;
   const [activeTab, setActiveTab] = useState('detalhes');
   const [status, setStatus] = useState(isNew ? 'Recebido' : 'Em Análise');
+
+  const [loading, setLoading] = useState(false);
+  const [clientName, setClientName] = useState('');
+  const [clientPhone, setClientPhone] = useState('');
+  const [deviceModel, setDeviceModel] = useState('');
+  const [problemDescription, setProblemDescription] = useState('');
+  const [technicalDiagnosis, setTechnicalDiagnosis] = useState('');
+
+  const handleSaveOS = async () => {
+    if (!isNew) {
+      alert('Atualização de OS em desenvolvimento...');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Usuário não autenticado');
+
+      const { data: profile, error: profileErr } = await supabase
+        .from('profiles')
+        .select('company_id')
+        .eq('id', user.id)
+        .single();
+        
+      if (profileErr) throw profileErr;
+
+      const { data: client, error: clientErr } = await supabase
+        .from('clients')
+        .insert({ company_id: profile.company_id, name: clientName || 'Cliente Balcão', phone: clientPhone })
+        .select().single();
+      if (clientErr) throw clientErr;
+
+      const { data: device, error: deviceErr } = await supabase
+        .from('devices')
+        .insert({ company_id: profile.company_id, client_id: client.id, model: deviceModel || 'Não informado' })
+        .select().single();
+      if (deviceErr) throw deviceErr;
+
+      const { data: order, error: orderErr } = await supabase
+        .from('orders')
+        .insert({
+          company_id: profile.company_id,
+          client_id: client.id,
+          device_id: device.id,
+          problem_description: problemDescription || technicalDiagnosis || 'Sem descrição',
+          status: status
+        })
+        .select().single();
+      if (orderErr) throw orderErr;
+
+      navigate('/dashboard/orders');
+    } catch (err: any) {
+      console.error(err);
+      alert('Erro ao salvar OS: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
@@ -58,8 +119,11 @@ const OrderDetails = () => {
               </button>
             </>
           )}
-          <button className="bg-[#1A1A1A] text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-black transition-colors premium-shadow flex items-center justify-center gap-2 w-full sm:w-auto">
-             <Save className="w-4 h-4" /> Salvar OS
+          <button 
+            onClick={handleSaveOS}
+            disabled={loading}
+            className="bg-[#1A1A1A] text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-black transition-colors premium-shadow flex items-center justify-center gap-2 w-full sm:w-auto disabled:opacity-50">
+             <Save className="w-4 h-4" /> {loading ? 'Salvando...' : 'Salvar OS'}
           </button>
         </div>
       </div>
@@ -101,16 +165,26 @@ const OrderDetails = () => {
                     <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2 border-b border-[#E5E5E5] pb-2">
                       <User className="w-4 h-4 text-[#D4AF37]" /> Dados do Cliente
                     </h3>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-500 mb-1">Cliente Vinculado</label>
-                      <div className="flex gap-2">
-                        <select className="w-full p-2.5 bg-[#F5F5F7] border border-transparent rounded-lg focus:bg-white focus:border-[#E5E5E5] focus:ring-2 focus:ring-[#1A1A1A] outline-none text-sm transition-all">
-                          <option>Selecione um cliente...</option>
-                          <option selected={!isNew}>João Silva (11 98765-4321)</option>
-                        </select>
-                        <button className="bg-[#F5F5F7] p-2.5 rounded-lg border border-transparent hover:bg-gray-200 transition-colors">
-                          <Plus className="w-5 h-5" />
-                        </button>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-500 mb-1">Nome do Cliente</label>
+                        <input 
+                          type="text" 
+                          value={clientName}
+                          onChange={e => setClientName(e.target.value)}
+                          placeholder="Ex: João da Silva"
+                          className="w-full p-2.5 bg-[#F5F5F7] border border-transparent rounded-lg focus:bg-white focus:border-[#E5E5E5] focus:ring-2 focus:ring-[#1A1A1A] outline-none text-sm transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-500 mb-1">WhatsApp</label>
+                        <input 
+                          type="text" 
+                          value={clientPhone}
+                          onChange={e => setClientPhone(e.target.value)}
+                          placeholder="(11) 99999-9999"
+                          className="w-full p-2.5 bg-[#F5F5F7] border border-transparent rounded-lg focus:bg-white focus:border-[#E5E5E5] focus:ring-2 focus:ring-[#1A1A1A] outline-none text-sm transition-all"
+                        />
                       </div>
                     </div>
                   </div>
@@ -120,11 +194,14 @@ const OrderDetails = () => {
                       <Smartphone className="w-4 h-4 text-[#D4AF37]" /> Aparelho
                     </h3>
                     <div>
-                      <label className="block text-xs font-medium text-gray-500 mb-1">Aparelho do Cliente</label>
-                      <select className="w-full p-2.5 bg-[#F5F5F7] border border-transparent rounded-lg focus:bg-white focus:border-[#E5E5E5] focus:ring-2 focus:ring-[#1A1A1A] outline-none text-sm transition-all">
-                        <option>Selecione um aparelho...</option>
-                        <option selected={!isNew}>iPhone 13 Pro (Azul Sierra)</option>
-                      </select>
+                      <label className="block text-xs font-medium text-gray-500 mb-1">Modelo do Aparelho</label>
+                      <input 
+                          type="text" 
+                          value={deviceModel}
+                          onChange={e => setDeviceModel(e.target.value)}
+                          placeholder="Ex: iPhone 13 Pro Max"
+                          className="w-full p-2.5 bg-[#F5F5F7] border border-transparent rounded-lg focus:bg-white focus:border-[#E5E5E5] focus:ring-2 focus:ring-[#1A1A1A] outline-none text-sm transition-all"
+                        />
                     </div>
                   </div>
                 </div>
@@ -139,9 +216,10 @@ const OrderDetails = () => {
                     <label className="block text-xs font-medium text-gray-500 mb-1">Problema Relatado (Pelo Cliente)</label>
                     <textarea 
                       rows={3} 
+                      value={problemDescription}
+                      onChange={e => setProblemDescription(e.target.value)}
                       className="w-full p-3 bg-[#F5F5F7] border border-transparent rounded-lg focus:bg-white focus:border-[#E5E5E5] focus:ring-2 focus:ring-[#1A1A1A] outline-none text-sm transition-all resize-none"
                       placeholder="Ex: Aparelho não carrega e bateria acaba rápido..."
-                      defaultValue={!isNew ? "Cliente informa que o celular parou de carregar do nada ontem a noite. Tentou com 2 cabos diferentes." : ""}
                     ></textarea>
                   </div>
                   
@@ -149,6 +227,8 @@ const OrderDetails = () => {
                     <label className="block text-xs font-medium text-gray-500 mb-1">Diagnóstico Técnico (Interno)</label>
                     <textarea 
                       rows={4} 
+                      value={technicalDiagnosis}
+                      onChange={e => setTechnicalDiagnosis(e.target.value)}
                       className="w-full p-3 bg-[#F5F5F7] border border-transparent rounded-lg focus:bg-white focus:border-[#E5E5E5] focus:ring-2 focus:ring-[#1A1A1A] outline-none text-sm transition-all resize-none"
                       placeholder="Análise do técnico após verificar o aparelho..."
                     ></textarea>

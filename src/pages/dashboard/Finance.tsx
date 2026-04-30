@@ -1,13 +1,7 @@
 import React, { useState } from 'react';
 import { Download, TrendingUp, TrendingDown, DollarSign, Filter, Search, Plus, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 
-const mockTransactions = [
-  { id: 'TRX-101', desc: 'OS-0039 - Troca de Tela iPhone 11', type: 'income', category: 'Serviço', date: '27/04/2026', amount: 'R$ 320,00' },
-  { id: 'TRX-102', desc: 'OS-0040 - Bateria iPad Air 4', type: 'income', category: 'Serviço', date: '28/04/2026', amount: 'R$ 890,00' },
-  { id: 'TRX-103', desc: 'Compra de Telas (Fornecedor X)', type: 'expense', category: 'Peças', date: '29/04/2026', amount: 'R$ -1.450,00' },
-  { id: 'TRX-104', desc: 'Conta de Luz', type: 'expense', category: 'Fixo', date: '30/04/2026', amount: 'R$ -250,00' },
-  { id: 'TRX-105', desc: 'OS-0041 - Adiantamento', type: 'income', category: 'Serviço', date: '30/04/2026', amount: 'R$ 150,00' },
-];
+const mockTransactions: any[] = [];
 
 const Finance = () => {
   const [searchTerm, setSearchTerm] = useState('');
