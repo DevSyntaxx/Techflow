@@ -151,7 +151,7 @@ const OrderDetails = () => {
               .maybeSingle();
 
             if (!existingFinance) {
-              await supabase.from('finance').insert({
+              const { error: finError } = await supabase.from('finance').insert({
                 company_id: profile.company_id,
                 order_id: id,
                 type: 'income',
@@ -161,6 +161,7 @@ const OrderDetails = () => {
                 due_date: new Date().toISOString().split('T')[0],
                 paid_date: new Date().toISOString()
               });
+              if (finError) throw new Error('Erro ao gerar financeiro: ' + finError.message);
             }
           }
         }
