@@ -183,9 +183,19 @@ const Auth = () => {
                   </div>
                 </div>
 
-                <button type="submit" disabled={isLoading} className="w-full flex justify-center items-center gap-2 bg-[#1A1A1A] text-white py-3 rounded-xl font-medium hover:bg-black transition-colors premium-shadow disabled:opacity-70">
-                  {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <>Entrar no painel <ArrowRight className="w-4 h-4" /></>}
-                </button>
+                <div className="space-y-3">
+                  <button type="submit" disabled={isLoading} className="w-full flex justify-center items-center gap-2 bg-[#1A1A1A] text-white py-3 rounded-xl font-medium hover:bg-black transition-colors premium-shadow disabled:opacity-70">
+                    {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <>Entrar no painel <ArrowRight className="w-4 h-4" /></>}
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => { setEmail('demo@techflow.com'); setPassword('demo123'); setTimeout(() => document.querySelector('form')?.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })), 100); }}
+                    disabled={isLoading} 
+                    className="w-full flex justify-center items-center gap-2 bg-[#F5F5F7] text-[#1A1A1A] py-3 rounded-xl font-medium hover:bg-gray-200 transition-colors border border-[#E5E5E5] disabled:opacity-70"
+                  >
+                    Ver Demonstração Rápida
+                  </button>
+                </div>
               </motion.form>
             ) : (
               <motion.form 
