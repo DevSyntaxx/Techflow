@@ -60,7 +60,12 @@ const OrderDetails = () => {
 
       const { data: device, error: deviceErr } = await supabase
         .from('devices')
-        .insert({ company_id: profile.company_id, client_id: client.id, model: deviceModel || 'Não informado' })
+        .insert({ 
+          company_id: profile.company_id, 
+          client_id: client.id, 
+          brand: 'Não informada',
+          model: deviceModel || 'Não informado' 
+        })
         .select().single();
       if (deviceErr) throw deviceErr;
 
@@ -70,7 +75,8 @@ const OrderDetails = () => {
           company_id: profile.company_id,
           client_id: client.id,
           device_id: device.id,
-          problem_description: problemDescription || technicalDiagnosis || 'Sem descrição',
+          display_id: 'OS-' + Math.floor(Math.random() * 10000).toString().padStart(4, '0'),
+          reported_problem: problemDescription || technicalDiagnosis || 'Sem descrição',
           status: status
         })
         .select().single();
