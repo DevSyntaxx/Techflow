@@ -158,10 +158,18 @@ CREATE TABLE leads (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Desabilitar RLS nas novas tabelas para o MVP funcionar sem bloqueios de permissão
-ALTER TABLE suppliers DISABLE ROW LEVEL SECURITY;
-ALTER TABLE inventory DISABLE ROW LEVEL SECURITY;
-ALTER TABLE finance DISABLE ROW LEVEL SECURITY;
-ALTER TABLE warranties DISABLE ROW LEVEL SECURITY;
-ALTER TABLE schedule DISABLE ROW LEVEL SECURITY;
-ALTER TABLE leads DISABLE ROW LEVEL SECURITY;
+-- HABILITAR RLS NAS NOVAS TABELAS (Padrão SaaS Seguro)
+ALTER TABLE suppliers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE inventory ENABLE ROW LEVEL SECURITY;
+ALTER TABLE finance ENABLE ROW LEVEL SECURITY;
+ALTER TABLE warranties ENABLE ROW LEVEL SECURITY;
+ALTER TABLE schedule ENABLE ROW LEVEL SECURITY;
+ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
+
+-- POLÍTICAS DE SEGURANÇA: Usuário só acessa dados da sua própria empresa
+CREATE POLICY "Users can manage own company suppliers" ON suppliers FOR ALL USING (company_id IN (SELECT company_id FROM profiles WHERE id = auth.uid()));
+CREATE POLICY "Users can manage own company inventory" ON inventory FOR ALL USING (company_id IN (SELECT company_id FROM profiles WHERE id = auth.uid()));
+CREATE POLICY "Users can manage own company finance" ON finance FOR ALL USING (company_id IN (SELECT company_id FROM profiles WHERE id = auth.uid()));
+CREATE POLICY "Users can manage own company warranties" ON warranties FOR ALL USING (company_id IN (SELECT company_id FROM profiles WHERE id = auth.uid()));
+CREATE POLICY "Users can manage own company schedule" ON schedule FOR ALL USING (company_id IN (SELECT company_id FROM profiles WHERE id = auth.uid()));
+CREATE POLICY "Users can manage own company leads" ON leads FOR ALL USING (company_id IN (SELECT company_id FROM profiles WHERE id = auth.uid()));
