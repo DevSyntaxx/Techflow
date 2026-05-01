@@ -176,7 +176,7 @@ const OrderDetails = () => {
     }
   };
 
-  const totalFinance = (Number(finance.parts) + Number(finance.labor)) - Number(finance.discount);
+  const totalFinance = (Number(finance.parts || 0) + Number(finance.labor || 0)) - Number(finance.discount || 0);
 
   if (fetching) {
     return <div className="p-8 text-center text-gray-500">Carregando detalhes da OS...</div>;
