@@ -53,9 +53,9 @@ const Landing = () => {
               <Link to="/auth?signup=true" className="w-full sm:w-auto text-base font-medium bg-[#1A1A1A] text-white px-8 py-4 rounded-full hover:bg-black transition-all transform hover:scale-105 premium-shadow flex items-center justify-center gap-2">
                 Começar agora <ChevronRight className="w-4 h-4" />
               </Link>
-              <a href="#demo" className="w-full sm:w-auto text-base font-medium bg-white text-[#1A1A1A] px-8 py-4 rounded-full hover:bg-gray-50 transition-all card-border premium-shadow flex items-center justify-center gap-2">
+              <Link to="/dashboard" className="w-full sm:w-auto text-base font-medium bg-white text-[#1A1A1A] px-8 py-4 rounded-full hover:bg-gray-50 transition-all card-border premium-shadow flex items-center justify-center gap-2">
                 <Play className="w-4 h-4" /> Ver demonstração
-              </a>
+              </Link>
             </div>
           </motion.div>
           
