@@ -43,7 +43,7 @@ function App() {
           <Route path="suppliers" element={<Suppliers />} />
           <Route path="schedule" element={<Schedule />} />
           <Route path="leads" element={<Leads />} />
-          <Route path="*" element={<div className="flex h-full items-center justify-center p-8 text-gray-500">Módulo em desenvolvimento...</div>} />
+          <Route path="*" element={<div className="flex h-full items-center justify-center p-8 text-gray-500">Página não encontrada</div>} />
         </Route>
       </Routes>
     </BrowserRouter>

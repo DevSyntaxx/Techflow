@@ -40,6 +40,7 @@ const Orders = () => {
           id,
           status,
           created_at,
+          finance_summary,
           clients (name, phone),
           devices (model)
         `)
@@ -147,7 +148,11 @@ const Orders = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 font-medium text-[#1A1A1A]">
-                      -
+                      {order.finance_summary 
+                        ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+                            (Number(order.finance_summary.parts || 0) + Number(order.finance_summary.labor || 0)) - Number(order.finance_summary.discount || 0)
+                          )
+                        : '-'}
                     </td>
                     <td className="px-6 py-4 text-gray-500">
                       {new Date(order.created_at).toLocaleDateString('pt-BR')}
