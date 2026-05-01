@@ -15,8 +15,10 @@ import {
   Search,
   Menu,
   X,
-  Shield
+  Shield,
+  LogOut
 } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
 
 const navItems = [
   { name: 'Visão Geral', path: '/dashboard', icon: LayoutDashboard },
@@ -32,18 +34,30 @@ const navItems = [
 ];
 const DashboardLayout = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profile, setProfile] = useState<any>(null);
   const location = useLocation();
+
+  React.useEffect(() => {
+    const fetchProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+        if (data) setProfile(data);
+      }
+    };
+    fetchProfile();
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#F5F5F7] flex flex-col md:flex-row text-[#1A1A1A] font-sans">
       {/* Mobile Header */}
       <div className="md:hidden bg-white border-b border-[#E5E5E5] px-4 py-3 flex items-center justify-between z-20">
-        <div className="flex items-center gap-2">
+        <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
           <div className="w-8 h-8 bg-[#1A1A1A] rounded-lg flex items-center justify-center">
              <span className="text-white font-bold text-xs">TF</span>
           </div>
           <span className="font-semibold text-lg">TechFlow</span>
-        </div>
+        </Link>
         <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2">
           {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
@@ -56,12 +70,12 @@ const DashboardLayout = () => {
         md:relative md:translate-x-0
       `}>
         <div className="h-20 hidden md:flex items-center px-6 border-b border-[#E5E5E5]">
-          <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <div className="w-8 h-8 bg-[#1A1A1A] rounded-lg flex items-center justify-center">
                <span className="text-white font-bold text-xs">TF</span>
             </div>
             <span className="font-bold text-xl tracking-tight">TechFlow</span>
-          </div>
+          </Link>
         </div>
 
         <div className="flex-1 overflow-y-auto py-6 px-4 space-y-1 scrollbar-hide">
@@ -103,14 +117,26 @@ const DashboardLayout = () => {
         </div>
 
         <div className="p-4 border-t border-[#E5E5E5]">
-          <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#F5F5F7] transition-colors cursor-pointer">
-            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold text-sm">
-              CM
+          <div className="flex items-center justify-between p-2 rounded-lg hover:bg-[#F5F5F7] transition-colors group">
+            <div className="flex items-center gap-3 overflow-hidden">
+              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold text-sm shrink-0">
+                {profile?.full_name?.substring(0,2).toUpperCase() || 'TF'}
+              </div>
+              <div className="flex-1 overflow-hidden">
+                <p className="text-sm font-semibold truncate">{profile?.full_name || 'Carregando...'}</p>
+                <p className="text-xs text-gray-500 truncate">{profile ? 'Sessão Ativa' : '...'}</p>
+              </div>
             </div>
-            <div className="flex-1 overflow-hidden">
-              <p className="text-sm font-semibold truncate">CM Place</p>
-              <p className="text-xs text-gray-500 truncate">Administrador</p>
-            </div>
+            <button 
+              onClick={async () => {
+                await supabase.auth.signOut();
+                window.location.href = '/auth';
+              }}
+              className="p-2 text-gray-400 hover:text-red-500 transition-colors opacity-100 sm:opacity-0 group-hover:opacity-100"
+              title="Sair"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
           </div>
         </div>
       </aside>

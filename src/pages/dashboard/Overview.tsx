@@ -79,43 +79,45 @@ const DashboardOverview = () => {
         .eq('company_id', companyId)
         .eq('status', 'novo');
 
-      if (orders && finance && leads) {
-        const opened = orders.filter(o => o.status === 'Em Análise').length;
-        const inProgress = orders.filter(o => o.status === 'Em Andamento' || o.status === 'Aprovado').length;
-        const ready = orders.filter(o => o.status === 'Pronto').length;
-        const delivered = orders.filter(o => o.status === 'Entregue').length;
-        const waitingParts = orders.filter(o => o.status === 'Aguardando Peça').length;
-        const pendingQuotes = orders.filter(o => o.status === 'Orçamento').length;
+      const validOrders = orders || [];
+      const validFinance = finance || [];
+      const validLeads = leads || [];
 
-        const income = finance.filter(f => f.type === 'income').reduce((acc, f) => acc + Number(f.amount), 0);
-        const expense = finance.filter(f => f.type === 'expense').reduce((acc, f) => acc + Number(f.amount), 0);
-        const profit = income - expense;
+      const opened = validOrders.filter(o => o.status === 'Em Análise').length;
+      const inProgress = validOrders.filter(o => o.status === 'Em Andamento' || o.status === 'Aprovado').length;
+      const ready = validOrders.filter(o => o.status === 'Pronto').length;
+      const delivered = validOrders.filter(o => o.status === 'Entregue').length;
+      const waitingParts = validOrders.filter(o => o.status === 'Aguardando Peça').length;
+      const pendingQuotes = validOrders.filter(o => o.status === 'Orçamento').length;
 
-        // Mock chart data to show some visual even if it's new
-        const chartData = [
-          { name: 'Sem 1', faturamento: income > 0 ? income * 0.2 : 1200 },
-          { name: 'Sem 2', faturamento: income > 0 ? income * 0.5 : 2100 },
-          { name: 'Sem 3', faturamento: income > 0 ? income * 0.8 : 1800 },
-          { name: 'Sem 4', faturamento: income > 0 ? income : 3200 },
-        ];
+      const income = validFinance.filter(f => f.type === 'income').reduce((acc, f) => acc + Number(f.amount), 0);
+      const expense = validFinance.filter(f => f.type === 'expense').reduce((acc, f) => acc + Number(f.amount), 0);
+      const profit = income - expense;
 
-        setData({
-          opened,
-          inProgress,
-          ready,
-          delivered,
-          revenue: income,
-          profit: profit,
-          alerts: {
-            waitingParts,
-            warranties: 0, // Mock for now until warranties module is fully used
-            pendingQuotes,
-            openLeads: leads.length
-          },
-          recentOrders: orders.slice(0, 5),
-          chartData
-        });
-      }
+      // Mock chart data to show some visual even if it's new
+      const chartData = [
+        { name: 'Sem 1', faturamento: income > 0 ? income * 0.2 : 1200 },
+        { name: 'Sem 2', faturamento: income > 0 ? income * 0.5 : 2100 },
+        { name: 'Sem 3', faturamento: income > 0 ? income * 0.8 : 1800 },
+        { name: 'Sem 4', faturamento: income > 0 ? income : 3200 },
+      ];
+
+      setData({
+        opened,
+        inProgress,
+        ready,
+        delivered,
+        revenue: income,
+        profit: profit,
+        alerts: {
+          waitingParts,
+          warranties: 0,
+          pendingQuotes,
+          openLeads: validLeads.length
+        },
+        recentOrders: validOrders.slice(0, 5),
+        chartData
+      });
 
     } catch (error) {
       console.error("Erro ao buscar dashboard:", error);
