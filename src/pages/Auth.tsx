@@ -46,9 +46,11 @@ const Auth = () => {
       const { data: profile } = await supabase.from('profiles').select('id').eq('id', authData.user.id).maybeSingle();
       
       if (!profile) {
+        const isDemo = email === 'demo@techflow.com';
+        
         const { data: company } = await supabase.from('companies').insert({
-          name: 'Minha Assistência',
-          slug: generateSlug('Minha Assistencia ' + authData.user.id.substring(0,4)),
+          name: isDemo ? 'Assistência Demo' : 'Minha Assistência',
+          slug: generateSlug((isDemo ? 'Assistência Demo ' : 'Minha Assistencia ') + authData.user.id.substring(0,4)),
           whatsapp: ''
         }).select().single();
         
@@ -56,7 +58,7 @@ const Auth = () => {
           await supabase.from('profiles').insert({
             id: authData.user.id,
             company_id: company.id,
-            full_name: 'Administrador',
+            full_name: isDemo ? 'Visitante' : 'Administrador',
             role: 'admin'
           });
         }
