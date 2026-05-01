@@ -13,6 +13,10 @@ import Inventory from './pages/dashboard/Inventory';
 import Warranties from './pages/dashboard/Warranties';
 import WarrantyDetails from './pages/dashboard/WarrantyDetails';
 import Settings from './pages/dashboard/Settings';
+import Devices from './pages/dashboard/Devices';
+import Suppliers from './pages/dashboard/Suppliers';
+import Schedule from './pages/dashboard/Schedule';
+import Leads from './pages/dashboard/Leads';
 
 function App() {
   return (
@@ -35,6 +39,10 @@ function App() {
           <Route path="warranties/new" element={<WarrantyDetails />} />
           <Route path="warranties/:id" element={<WarrantyDetails />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="devices" element={<Devices />} />
+          <Route path="suppliers" element={<Suppliers />} />
+          <Route path="schedule" element={<Schedule />} />
+          <Route path="leads" element={<Leads />} />
           <Route path="*" element={<div className="flex h-full items-center justify-center p-8 text-gray-500">Módulo em desenvolvimento...</div>} />
         </Route>
       </Routes>
