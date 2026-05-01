@@ -30,18 +30,45 @@ const Auth = () => {
     setIsLoading(true);
     setErrorMsg('');
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { data: authData, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
-      setErrorMsg('E-mail ou senha incorretos.');
+      if (error || !authData.user) {
+        setErrorMsg('E-mail ou senha incorretos.');
+        setIsLoading(false);
+        return;
+      }
+
+      // Self-heal: se o usuário foi criado pelo painel do Supabase, não terá profile
+      const { data: profile } = await supabase.from('profiles').select('id').eq('id', authData.user.id).maybeSingle();
+      
+      if (!profile) {
+        const { data: company } = await supabase.from('companies').insert({
+          name: 'Minha Assistência',
+          slug: generateSlug('Minha Assistencia ' + authData.user.id.substring(0,4)),
+          whatsapp: ''
+        }).select().single();
+        
+        if (company) {
+          await supabase.from('profiles').insert({
+            id: authData.user.id,
+            company_id: company.id,
+            full_name: 'Administrador',
+            role: 'admin'
+          });
+        }
+      }
+
+      navigate('/dashboard');
+    } catch (err) {
+      console.error(err);
+      setErrorMsg('Erro interno ao fazer login.');
+    } finally {
       setIsLoading(false);
-      return;
     }
-
-    navigate('/dashboard');
   };
 
   const generateSlug = (text: string) => {
