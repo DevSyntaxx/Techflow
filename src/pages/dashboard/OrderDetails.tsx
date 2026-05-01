@@ -139,6 +139,32 @@ const OrderDetails = () => {
           .eq('id', id);
         
         if (error) throw error;
+
+        // Auto add to finance if Entregue
+        if (status === 'Entregue') {
+          const totalValue = (Number(finance.parts || 0) + Number(finance.labor || 0)) - Number(finance.discount || 0);
+          if (totalValue > 0) {
+            const { data: existingFinance } = await supabase
+              .from('finance')
+              .select('id')
+              .eq('order_id', id)
+              .maybeSingle();
+
+            if (!existingFinance) {
+              await supabase.from('finance').insert({
+                company_id: profile.company_id,
+                order_id: id,
+                type: 'income',
+                description: `Recebimento OS-${orderData?.display_id || id.split('-')[0]}`,
+                amount: totalValue,
+                status: 'paid',
+                due_date: new Date().toISOString().split('T')[0],
+                paid_date: new Date().toISOString()
+              });
+            }
+          }
+        }
+
         alert('OS atualizada com sucesso!');
         fetchOrder();
       }
